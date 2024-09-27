@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBWNFIXYC38e1DzCjNTbcuEiiON1DK5WCk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>406119866963</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.company.pushnotification</string>
+	<key>PROJECT_ID</key>
+	<string>push-notification-test-54a60</string>
+	<key>STORAGE_BUCKET</key>
+	<string>push-notification-test-54a60.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:406119866963:ios:666c590740cf1f7520dca6</string>
+</dict>
+</plist>
