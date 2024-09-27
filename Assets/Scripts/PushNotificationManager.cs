@@ -2,8 +2,8 @@ using Firebase.Messaging;
 using Firebase;
 using UnityEngine;
 using Firebase.Extensions;
-using Unity.Notifications.Android;
-using UnityEngine.Android;
+// using Unity.Notifications.Android;
+// using UnityEngine.Android;
 using Unity.Notifications.iOS;
 using System.Collections.Generic;
 
