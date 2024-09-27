@@ -15,107 +15,107 @@ public class PushNotificationManager : MonoBehaviour
     void Start()
     {
 #if UNITY_ANDROID
-        InitializeAndroidLocalPush();
-        InitializeAndroidFCM();
+        // InitializeAndroidLocalPush();
+        // InitializeAndroidFCM();
 #elif UNITY_IOS
         RequestAuthorization();
         InitializeIosFCM();
 #endif
     }
 
-    public void InitializeAndroidLocalPush()
-    {
-        string androidInfo = SystemInfo.operatingSystem;
-        Debug.Log("androidInfo: " + androidInfo);
-        apiLevel = int.Parse(androidInfo.Substring(androidInfo.IndexOf("-") + 1, 2));
-        Debug.Log("apiLevel: " + apiLevel);
+    //public void InitializeAndroidLocalPush()
+    //{
+    //    string androidInfo = SystemInfo.operatingSystem;
+    //    Debug.Log("androidInfo: " + androidInfo);
+    //    apiLevel = int.Parse(androidInfo.Substring(androidInfo.IndexOf("-") + 1, 2));
+    //    Debug.Log("apiLevel: " + apiLevel);
 
-        if (apiLevel >= 33 &&
-            !Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
-        {
-            Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
-        }
+    //    if (apiLevel >= 33 &&
+    //        !Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
+    //    {
+    //        Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
+    //    }
 
-        if (apiLevel >= 26)
-        {
-            var channel = new AndroidNotificationChannel()
-            {
-                Id = CHANNEL_ID,
-                Name = "test",
-                Importance = Importance.High,
-                Description = "for test",
-            };
-            AndroidNotificationCenter.RegisterNotificationChannel(channel);
-        }
-    }
+    //    if (apiLevel >= 26)
+    //    {
+    //        var channel = new AndroidNotificationChannel()
+    //        {
+    //            Id = CHANNEL_ID,
+    //            Name = "test",
+    //            Importance = Importance.High,
+    //            Description = "for test",
+    //        };
+    //        AndroidNotificationCenter.RegisterNotificationChannel(channel);
+    //    }
+    //}
 
-    public void InitializeAndroidFCM()
-    {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => {
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == DependencyStatus.Available)
-            {
-                Debug.Log("Google Play version OK");
+    //public void InitializeAndroidFCM()
+    //{
+    //    FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => {
+    //        var dependencyStatus = task.Result;
+    //        if (dependencyStatus == DependencyStatus.Available)
+    //        {
+    //            Debug.Log("Google Play version OK");
 
-                FirebaseMessaging.TokenReceived += OnAndroidTokenReceived;
-                FirebaseMessaging.MessageReceived += OnAndroidMessageReceived;
-                FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task => {
-                    Debug.Log("push permission: " + task.Status.ToString());
-                });
-                FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
-            }
-            else
-            {
-                Debug.LogError(string.Format(
-                    "Could not resolve all Firebase dependencies: {0}",
-                    dependencyStatus
-                ));
-            }
-        });
-    }
+    //            FirebaseMessaging.TokenReceived += OnAndroidTokenReceived;
+    //            FirebaseMessaging.MessageReceived += OnAndroidMessageReceived;
+    //            FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task => {
+    //                Debug.Log("push permission: " + task.Status.ToString());
+    //            });
+    //            FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
+    //        }
+    //        else
+    //        {
+    //            Debug.LogError(string.Format(
+    //                "Could not resolve all Firebase dependencies: {0}",
+    //                dependencyStatus
+    //            ));
+    //        }
+    //    });
+    //}
 
-    public void OnAndroidTokenReceived(object sender, TokenReceivedEventArgs token)
-    {
-        Debug.Log("OnTokenReceived: " + token.Token);
-    }
+    //public void OnAndroidTokenReceived(object sender, TokenReceivedEventArgs token)
+    //{
+    //    Debug.Log("OnTokenReceived: " + token.Token);
+    //}
 
-    public void OnAndroidMessageReceived(object sender, MessageReceivedEventArgs e)
-    {
-        string type = "";
-        string title = "";
-        string body = "";
+    //public void OnAndroidMessageReceived(object sender, MessageReceivedEventArgs e)
+    //{
+    //    string type = "";
+    //    string title = "";
+    //    string body = "";
 
-        // for notification message
-        if (e.Message.Notification != null)
-        {
-            type = "notification";
-            title = e.Message.Notification.Title;
-            body = e.Message.Notification.Body;
-        }
-        // for data message
-        else if (e.Message.Data.Count > 0)
-        {
-            type = "data";
-            title = e.Message.Data["title"];
-            body = e.Message.Data["body"];
-        }
-        Debug.Log("message type: " + type + ", title: " + title + ", body: " + body);
+    //    // for notification message
+    //    if (e.Message.Notification != null)
+    //    {
+    //        type = "notification";
+    //        title = e.Message.Notification.Title;
+    //        body = e.Message.Notification.Body;
+    //    }
+    //    // for data message
+    //    else if (e.Message.Data.Count > 0)
+    //    {
+    //        type = "data";
+    //        title = e.Message.Data["title"];
+    //        body = e.Message.Data["body"];
+    //    }
+    //    Debug.Log("message type: " + type + ", title: " + title + ", body: " + body);
 
-        var notification = new AndroidNotification();
-        notification.SmallIcon = "icon_0";
-        notification.Title = title;
-        notification.Text = body;
-        notification.FireTime = System.DateTime.Now;
+    //    var notification = new AndroidNotification();
+    //    notification.SmallIcon = "icon_0";
+    //    notification.Title = title;
+    //    notification.Text = body;
+    //    notification.FireTime = System.DateTime.Now;
 
-        if (apiLevel >= 26)
-        {
-            AndroidNotificationCenter.SendNotification(notification, CHANNEL_ID);
-        }
-        else
-        {
-            Debug.LogError("Android 8.0 이상의 디바이스에서만 푸시 알림이 정상적으로 표시됩니다.");
-        }
-    }
+    //    if (apiLevel >= 26)
+    //    {
+    //        AndroidNotificationCenter.SendNotification(notification, CHANNEL_ID);
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("Android 8.0 이상의 디바이스에서만 푸시 알림이 정상적으로 표시됩니다.");
+    //    }
+    //}
 
     public IEnumerator<string> RequestAuthorization()
     {
