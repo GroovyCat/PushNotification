@@ -372,7 +372,7 @@ GameObject:
   - component: {fileID: 1054705960}
   - component: {fileID: 1054705961}
   m_Layer: 0
-  m_Name: FirebaseManager
+  m_Name: PushNotificationManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -402,7 +402,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1054705958}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a40a1af6a8b91a84487d04b4f65a7922, type: 3}
+  m_Script: {fileID: 11500000, guid: f5cebcd0e0a809c46bb017f3583c40e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1886764385

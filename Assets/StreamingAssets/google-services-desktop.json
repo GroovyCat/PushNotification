@@ -7,22 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:406119866963:ios:666c590740cf1f7520dca6",
+        "mobilesdk_app_id": "1:406119866963:android:b0896b08754d457d20dca6",
         "android_client_info": {
-          "package_name": "com.company.pushnotification"
+          "package_name": "com.arcstar.pushnotificationtest"
         }
       },
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBWNFIXYC38e1DzCjNTbcuEiiON1DK5WCk"
+          "current_key": "AIzaSyBX9GIPgMZgb0fKxcPWjzGNf4uiGR7gSYI"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 0
-        },
         "appinvite_service": {
-          "status": 1
+          "other_platform_oauth_client": []
         }
       }
     }
