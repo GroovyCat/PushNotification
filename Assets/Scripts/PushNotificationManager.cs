@@ -1,57 +1,58 @@
-using Firebase.Messaging;
-using Firebase;
-using System.Collections.Generic;
-using UnityEngine;
-using Firebase.Extensions;
-using UnityEngine.Android;
-#if UNITY_IOS
-using Unity.Notifications.iOS;
-#endif
-#if UNITY_ANDROID
-using Unity.Notifications.Android;
-#endif
-using UnityEngine.UI;
 using System;
+using UnityEngine;
+using Firebase;
+using Firebase.Messaging;
+using Firebase.Extensions;
+#if UNITY_ANDROID
+using UnityEngine.Android; 
+using Unity.Notifications.Android; // Unity에서 제공하는 푸시 알림 Package (Version 2.3.2)
+#endif
+#if UNITY_IOS
+using Unity.Notifications.iOS; // Unity에서 제공하는 푸시 알림 Package (Version 2.3.2)
+#endif
 
 
 
 public class PushNotificationManager : MonoBehaviour
 {
-    readonly string CHANNEL_ID = "channelFcm";
-    int apiLevel;
-    public Text text;
-    // Start is called before the first frame update
+    readonly private string _channelID = "FirebaseCloudMessagingTestChannel"; // 채널 ID 필드
+    private int _apiLevel; // API 레벨 필드
+
     void Start()
     {
 #if UNITY_ANDROID
-        InitializeAndroidLocalPush();
-        InitializeAndroidFCM();
+        RequestAuthorizationForAndroid();
+        OnFirebaseCloudMessagingForAndroid();
 #endif
 #if UNITY_IOS
-		RequestAuthorization();
-        InitializeIosFCM();       
+		RequestAuthorizationForApple();
+        OnFirebaseCloudMessagingForApple();  
 #endif
     }
 
 #if UNITY_ANDROID
-    public void InitializeAndroidLocalPush()
+    // 권한 부여 요청 메서드(안드로이드)
+    public void RequestAuthorizationForAndroid()
     {
+        // Android Version 체크 및 API Level 체크 
         string androidInfo = SystemInfo.operatingSystem;
         Debug.Log("androidInfo: " + androidInfo);
-        apiLevel = int.Parse(androidInfo.Substring(androidInfo.IndexOf("-") + 1, 2));
-        Debug.Log("apiLevel: " + apiLevel);
 
-        if (apiLevel >= 33 &&
+        _apiLevel = int.Parse(androidInfo.Substring(androidInfo.IndexOf("-") + 1, 2));
+        Debug.Log("apiLevel: " + _apiLevel);
+
+        // API 33부터는 알림 게시 권한을 요청해야 함
+        if (_apiLevel >= 33 &&
             !Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
         {
             Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
         }
-
-        if (apiLevel >= 26)
+        // API 26부터는 채널 ID를 통해 알림 상태를 추적할 수 있음
+        if (_apiLevel >= 26)
         {
             var channel = new AndroidNotificationChannel()
             {
-                Id = CHANNEL_ID,
+                Id = _channelID,
                 Name = "test",
                 Importance = Importance.High,
                 Description = "for test",
@@ -60,8 +61,9 @@ public class PushNotificationManager : MonoBehaviour
         }
     }
 
-    public void InitializeAndroidFCM()
+    public void OnFirebaseCloudMessagingForAndroid()
     {
+        // Dependecy(Google Play 버전) 체크 및 Firebase Cloud Messaging 실행 메서드
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             var dependencyStatus = task.Result;
@@ -69,12 +71,14 @@ public class PushNotificationManager : MonoBehaviour
             {
                 Debug.Log("Google Play version OK");
 
-                FirebaseMessaging.TokenReceived += OnAndroidTokenReceived;
-                FirebaseMessaging.MessageReceived += OnAndroidMessageReceived;
+                // Firebase Cloud Meassaging 초기화
+                FirebaseMessaging.TokenReceived += OnTokenReceivedForAndroid;
+                FirebaseMessaging.MessageReceived += OnMessageReceivedForAndroid;
                 FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task =>
                 {
                     Debug.Log("push permission: " + task.Status.ToString());
                 });
+                // Token 등록 초기화 
                 FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
             }
             else
@@ -87,25 +91,26 @@ public class PushNotificationManager : MonoBehaviour
         });
     }
 
-    public void OnAndroidTokenReceived(object sender, TokenReceivedEventArgs token)
+    public void OnTokenReceivedForAndroid(object sender, TokenReceivedEventArgs token)
     {
         Debug.Log("OnTokenReceived: " + token.Token);
     }
 
-    public void OnAndroidMessageReceived(object sender, MessageReceivedEventArgs e)
+    // 원하는 메세지 작성 가능
+    public void OnMessageReceivedForAndroid(object sender, MessageReceivedEventArgs e)
     {
         string type = "";
         string title = "";
         string body = "";
 
-        // for notification message
+        // 알림 메시지를 위한
         if (e.Message.Notification != null)
         {
             type = "notification";
             title = e.Message.Notification.Title;
             body = e.Message.Notification.Body;
         }
-        // for data message
+        // 데이터 메시지를 위한
         else if (e.Message.Data.Count > 0)
         {
             type = "data";
@@ -122,10 +127,9 @@ public class PushNotificationManager : MonoBehaviour
             notification.FireTime = DateTime.Now;
         }
 
-        if (apiLevel >= 26)
+        if (_apiLevel >= 26)
         {
-            AndroidNotificationCenter.SendNotification(notification, CHANNEL_ID);
-            text.text = "title : " + notification.Title + "Text : " + notification.Text;
+            AndroidNotificationCenter.SendNotification(notification, _channelID);
         }
         else
         {
@@ -136,30 +140,39 @@ public class PushNotificationManager : MonoBehaviour
 
 
 #if UNITY_IOS
-    public IEnumerator<string> RequestAuthorization()
+    // 권한 부여 요청하는 메서드(iOS)
+    public IEnumerator<string> RequestAuthorizationForApple()
     {
-        var req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true);
-        while (!req.IsFinished)
+        var request = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true);
+        while (!request.IsFinished)
         {
             yield return null;
         }
+
+        string respond = "\n RequestAuthorization: ";
+        respond += "\n finished: " + request.IsFinished;
+        respond += "\n granted :  " + request.Granted;
+        respond += "\n error:  " + request.Error;
+        respond += "\n deviceToken:  " + request.DeviceToken;
+        Debug.Log(respond);
     }
 
-    public void InitializeIosFCM()
+    public void OnFirebaseCloudMessagingForApple()
     {
+        // Dependecy 체크 및 FirebaseCloudMessaging 실행 메서드
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             var dependencyStatus = task.Result;
             if (dependencyStatus == DependencyStatus.Available)
             {
-                Debug.Log("Google Play version OK");
-
-                FirebaseMessaging.TokenReceived += OnIosTokenReceived;
-                FirebaseMessaging.MessageReceived += OnIosMessageReceived;
+                // Firebase Cloud Meassaging 초기화
+                FirebaseMessaging.TokenReceived += OnTokenReceivedForApple;
+                FirebaseMessaging.MessageReceived += OnIosMessageReceivedForApple;
                 FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task =>
                 {
                     Debug.Log("push permission: " + task.Status.ToString());
                 });
+                // Token 등록 초기화 
                 FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
             }
             else
@@ -172,32 +185,33 @@ public class PushNotificationManager : MonoBehaviour
         });
     }
 
-    public void OnIosTokenReceived(object sender, TokenReceivedEventArgs token)
+    public void OnTokenReceivedForApple(object sender, TokenReceivedEventArgs token)
     {
         Debug.Log("ontokenreceived: " + token.Token);
     }
 
-    public void OnIosMessageReceived(object sender, MessageReceivedEventArgs e)
+    // 원하는 메세지 작성 가능
+    public void OnMessageReceivedForApple(object sender, MessageReceivedEventArgs e)
     {
         string type = "";
         string title = "";
         string body = "";
-        int firetimeinseconds = 1;
+        int fireTimeinSeconds = 1;
 
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
         {
-            TimeInterval = new TimeSpan(0, 0, firetimeinseconds),
+            TimeInterval = new TimeSpan(0, 0, fireTimeinSeconds),
             Repeats = false
         };
 
-        // for notification message
+        // 알림 메시지를 위한
         if (e.Message.Notification != null)
         {
             type = "notification";
             title = e.Message.Notification.Title;
             body = e.Message.Notification.Body;
         }
-        // for data message
+        // 데이터 메시지를 위한
         else if (e.Message.Data.Count > 0)
         {
             type = "data";
