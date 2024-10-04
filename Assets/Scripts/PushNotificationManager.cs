@@ -168,7 +168,7 @@ public class PushNotificationManager : MonoBehaviour
             {
                 // Firebase Cloud Meassaging ÃÊ±âÈ­
                 FirebaseMessaging.TokenReceived += OnTokenReceivedForApple;
-                FirebaseMessaging.MessageReceived += OnIosMessageReceivedForApple;
+                FirebaseMessaging.MessageReceived += OnMessageReceivedForApple;
                 FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task =>
                 {
                     Debug.Log("push permission: " + task.Status.ToString());
