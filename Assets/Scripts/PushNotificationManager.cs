@@ -9,6 +9,7 @@ using Unity.Notifications.Android; // Unity에서 제공하는 푸시 알림 Package (Vers
 #endif
 #if UNITY_IOS
 using Unity.Notifications.iOS; // Unity에서 제공하는 푸시 알림 Package (Version 2.3.2)
+using System.Collections.Generic;
 #endif
 
 
