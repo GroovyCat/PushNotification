@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "406119866963",
-    "project_id": "push-notification-test-54a60",
-    "storage_bucket": "push-notification-test-54a60.appspot.com"
+    "project_number": "431444478999",
+    "project_id": "notification-198a3",
+    "storage_bucket": "notification-198a3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:406119866963:android:b0896b08754d457d20dca6",
+        "mobilesdk_app_id": "1:431444478999:android:1aca15be592271e41a6052",
         "android_client_info": {
-          "package_name": "com.arcstar.pushnotificationtest"
+          "package_name": "com.arcstar.notification"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBX9GIPgMZgb0fKxcPWjzGNf4uiGR7gSYI"
+          "current_key": "AIzaSyA0ZSty2xJK4au3TKTo6b5-BF4lfpxzb3M"
         }
       ],
       "services": {

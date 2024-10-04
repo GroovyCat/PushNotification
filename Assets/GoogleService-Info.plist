@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBWNFIXYC38e1DzCjNTbcuEiiON1DK5WCk</string>
+	<string>AIzaSyBiWZZAAgG4Fe7Vuk1zaPDfkhDOffgBxeQ</string>
 	<key>GCM_SENDER_ID</key>
-	<string>406119866963</string>
+	<string>431444478999</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.arcstar.pushnotificationtest</string>
+	<string>com.arcstar.notification</string>
 	<key>PROJECT_ID</key>
-	<string>push-notification-test-54a60</string>
+	<string>notification-198a3</string>
 	<key>STORAGE_BUCKET</key>
-	<string>push-notification-test-54a60.appspot.com</string>
+	<string>notification-198a3.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:406119866963:ios:9f28fda96dc0c49020dca6</string>
+	<string>1:431444478999:ios:3ad5ceba48b931721a6052</string>
 </dict>
 </plist>
