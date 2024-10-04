@@ -7,6 +7,7 @@ using Firebase.Extensions;
 using Unity.Notifications.iOS;
 // using Unity.Notifications.Android;
 using UnityEngine.UI;
+using System;
 
 
 
@@ -113,7 +114,7 @@ public class PushNotificationManager : MonoBehaviour
     //        notification.SmallIcon = "icon_0";
     //        notification.Title = title;
     //        notification.Text = body;
-    //        notification.FireTime = System.DateTime.Now;
+    //        notification.FireTime = DateTime.Now;
     //    }
 
     //    if (apiLevel >= 26)
@@ -128,88 +129,90 @@ public class PushNotificationManager : MonoBehaviour
     //}
 
 
-    public ienumerator<string> requestauthorization()
+    public IEnumerator<string> RequestAuthorization()
     {
-        var req = new authorizationrequest(authorizationoption.alert | authorizationoption.badge, true);
-        while (!req.isfinished)
+        var req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true);
+        while (!req.IsFinished)
         {
             yield return null;
         }
     }
 
-    public void initializeiosfcm()
+    public void InitializeIosFCM()
     {
-        firebaseapp.checkandfixdependenciesasync().continuewith(task =>
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
-            var dependencystatus = task.result;
-            if (dependencystatus == dependencystatus.available)
+            var dependencyStatus = task.Result;
+            if (dependencyStatus == DependencyStatus.Available)
             {
-                firebasemessaging.tokenreceived += oniostokenreceived;
-                firebasemessaging.messagereceived += oniosmessagereceived;
-                firebasemessaging.requestpermissionasync().continuewithonmainthread(task =>
+                Debug.Log("Google Play version OK");
+
+                FirebaseMessaging.TokenReceived += OnIosTokenReceived;
+                FirebaseMessaging.MessageReceived += OnIosMessageReceived;
+                FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task =>
                 {
-                    debug.log("push permission: " + task.status.tostring());
+                    Debug.Log("push permission: " + task.Status.ToString());
                 });
-                firebasemessaging.tokenregistrationoninitenabled = true;
+                FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
             }
             else
             {
-                debug.logerror(string.format(
-                    "could not resolve all firebase dependencies: {0}",
-                    dependencystatus
+                Debug.LogError(string.Format(
+                    "Could not resolve all Firebase dependencies: {0}",
+                    dependencyStatus
                 ));
             }
         });
     }
 
-    public void oniostokenreceived(object sender, tokenreceivedeventargs token)
+    public void OnIosTokenReceived(object sender, TokenReceivedEventArgs token)
     {
-        debug.log("ontokenreceived: " + token.token);
+        Debug.Log("ontokenreceived: " + token.Token);
     }
 
-    public void oniosmessagereceived(object sender, messagereceivedeventargs e)
+    public void OnIosMessageReceived(object sender, MessageReceivedEventArgs e)
     {
         string type = "";
         string title = "";
         string body = "";
         int firetimeinseconds = 1;
 
-        var timetrigger = new iosnotificationtimeintervaltrigger()
+        var timeTrigger = new iOSNotificationTimeIntervalTrigger()
         {
-            timeinterval = new system.timespan(0, 0, firetimeinseconds),
-            repeats = false
+            TimeInterval = new TimeSpan(0, 0, firetimeinseconds),
+            Repeats = false
         };
 
         // for notification message
-        if (e.message.notification != null)
+        if (e.Message.Notification != null)
         {
             type = "notification";
-            title = e.message.notification.title;
-            body = e.message.notification.body;
+            title = e.Message.Notification.Title;
+            body = e.Message.Notification.Body;
         }
         // for data message
-        else if (e.message.data.count > 0)
+        else if (e.Message.Data.Count > 0)
         {
             type = "data";
-            title = e.message.data["title"];
-            body = e.message.data["body"];
+            title = e.Message.Data["title"];
+            body = e.Message.Data["body"];
         }
-        debug.log("message type: " + type + ", title: " + title + ", body: " + body);
+        Debug.Log("message type: " + type + ", title: " + title + ", body: " + body);
 
-        var notification = new iosnotification()
+        var notification = new iOSNotification()
         {
-            identifier = "hello_world_notification",
-            title = title,
-            body = body,
-            subtitle = type,
-            showinforeground = true,
-            foregroundpresentationoption = (presentationoption.alert | presentationoption.sound),
-            categoryidentifier = "default_category",
-            threadidentifier = "thread1",
-            trigger = timetrigger
+            Identifier = "_notification_01",
+            Title = "Title",
+            Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
+            Subtitle = "This is a subtitle, something, something important...",
+            ShowInForeground = true,
+            ForegroundPresentationOption = (PresentationOption.Alert | PresentationOption.Sound),
+            CategoryIdentifier = "category_a",
+            ThreadIdentifier = "thread1",
+            Trigger = timeTrigger,
 
         };
 
-        iosnotificationcenter.schedulenotification(notification);
+        iOSNotificationCenter.ScheduleNotification(notification);
     }
 }
