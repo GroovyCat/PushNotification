@@ -25,7 +25,7 @@ public class PushNotificationManager : MonoBehaviour
         OnFirebaseCloudMessagingForAndroid();
 #endif
 #if UNITY_IOS
-		RequestAuthorizationForApple();
+		RequestAuthorization();
         OnFirebaseCloudMessagingForApple();  
 #endif
     }
@@ -141,7 +141,7 @@ public class PushNotificationManager : MonoBehaviour
 
 #if UNITY_IOS
     // 권한 부여 요청하는 메서드(iOS)
-    public IEnumerator<string> RequestAuthorizationForApple()
+    public IEnumerator<string> RequestAuthorization()
     {
         var request = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true);
         while (!request.IsFinished)
