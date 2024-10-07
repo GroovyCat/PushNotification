@@ -16,7 +16,7 @@
 ### Android 설정
 + Unity 프로젝트에서 keystore 설정 후 SHA-1 or SHA-256 등록
   + Player Settings > publishing settings > keystore manager > Create New > Anywhere
-  + 생성 후 keystore가 설치된 경로로 간 후 윈도우 기준 cmd 창 열기
+  + 생성 후 keystore가 설치된 경로로 간 후 터미널 창 열기
 ```bash
 keytool -list -v keystore 생성한 keyname.keystore
 ```
