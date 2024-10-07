@@ -21,7 +21,8 @@
 keytool -list -v keystore 생성한 keyname.keystore
 ```
 
-  + Firebase Console의 프로젝트의 안드로이드 앱 설정 > SHA 인증서 지문 설정
++ Firebase Console의 프로젝트의 안드로이드 앱 설정 > SHA 인증서 지문 설정
++ Unity 안드로이드 빌드 세팅 후 apk 설치 
 + Firebase Console 프로젝트에서 Messaging 서비스를 통해 푸시 알림 테스트 진행
 
 
@@ -37,3 +38,4 @@ keytool -list -v keystore 생성한 keyname.keystore
 + Automatically manage signing 체크
 + Siging & Capabilities에서 **+** Capability 클릭 > Push Notification 추가
 + Xcode에서 앱 빌드 후 실행
++ Firebase Console 프로젝트에서 Messaging 서비스를 통해 푸시 알림 테스트 진행
