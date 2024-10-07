@@ -34,5 +34,5 @@ keytool -list -v keystore 생성한 keyname.keystore
 + 유니티 iOS 필드 세팅 후 빌드 후 Xcode로 .workspace 파일 열기
 + General 탭에서 UserNotifications.framework 라이브러리 추가
 + Automatically manage signing 체크
-+ Siging & Capabilities에서 '+' Capability 클릭 > Push Notification 추가
++ Siging & Capabilities에서 **+** Capability 클릭 > Push Notification 추가
 + Xcode에서 앱 빌드 후 실행
