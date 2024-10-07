@@ -1,85 +1,52 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Firebase;
 using Firebase.Messaging;
 using Firebase.Extensions;
 #if UNITY_ANDROID
-using UnityEngine.Android; 
-using Unity.Notifications.Android; // Unity¿¡¼­ Á¦°øÇÏ´Â Çª½Ã ¾Ë¸² Package (Version 2.3.2)
+using UnityEngine.Android;
+using Unity.Notifications.Android; // Unityì—ì„œ ì œê³µí•˜ëŠ” í‘¸ì‹œ ì•Œë¦¼ Package (Version 2.3.2)
+#elif UNITY_IOS
+using Unity.Notifications.iOS; // Unityì—ì„œ ì œê³µí•˜ëŠ” í‘¸ì‹œ ì•Œë¦¼ Package (Version 2.3.2)
 #endif
-#if UNITY_IOS
-using Unity.Notifications.iOS; // Unity¿¡¼­ Á¦°øÇÏ´Â Çª½Ã ¾Ë¸² Package (Version 2.3.2)
-using System.Collections.Generic;
-#endif
-
-
 
 public class PushNotificationManager : MonoBehaviour
 {
-    readonly private string _channelID = "FirebaseCloudMessagingTestChannel"; // Ã¤³Î ID ÇÊµå
-    private int _apiLevel; // API ·¹º§ ÇÊµå
+    private const string ChannelID = "FirebaseCloudMessagingNotificationChannel"; // ì±„ë„ ID í•„ë“œ
+    private int _androidApiLevel; // API ë ˆë²¨ í•„ë“œ
 
     void Start()
     {
 #if UNITY_ANDROID
         RequestAuthorizationForAndroid();
-        OnFirebaseCloudMessagingForAndroid();
-#endif
-#if UNITY_IOS
-		RequestAuthorization();
-        OnFirebaseCloudMessagingForApple();  
+        InitalizeFirebaseCloudMessaging();
+#elif UNITY_IOS
+        RequestAuthorizationForApple();
+        InitalizeFirebaseCloudMessaging();  
 #endif
     }
-
-#if UNITY_ANDROID
-    // ±ÇÇÑ ºÎ¿© ¿äÃ» ¸Ş¼­µå(¾Èµå·ÎÀÌµå)
-    public void RequestAuthorizationForAndroid()
+    
+    public void InitalizeFirebaseCloudMessaging()
     {
-        // Android Version Ã¼Å© ¹× API Level Ã¼Å© 
-        string androidInfo = SystemInfo.operatingSystem;
-        Debug.Log("androidInfo: " + androidInfo);
-
-        _apiLevel = int.Parse(androidInfo.Substring(androidInfo.IndexOf("-") + 1, 2));
-        Debug.Log("apiLevel: " + _apiLevel);
-
-        // API 33ºÎÅÍ´Â ¾Ë¸² °Ô½Ã ±ÇÇÑÀ» ¿äÃ»ÇØ¾ß ÇÔ
-        if (_apiLevel >= 33 &&
-            !Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
-        {
-            Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
-        }
-        // API 26ºÎÅÍ´Â Ã¤³Î ID¸¦ ÅëÇØ ¾Ë¸² »óÅÂ¸¦ ÃßÀûÇÒ ¼ö ÀÖÀ½
-        if (_apiLevel >= 26)
-        {
-            var channel = new AndroidNotificationChannel()
-            {
-                Id = _channelID,
-                Name = "test",
-                Importance = Importance.High,
-                Description = "for test",
-            };
-            AndroidNotificationCenter.RegisterNotificationChannel(channel);
-        }
-    }
-
-    public void OnFirebaseCloudMessagingForAndroid()
-    {
-        // Dependecy(Google Play ¹öÀü) Ã¼Å© ¹× Firebase Cloud Messaging ½ÇÇà ¸Ş¼­µå
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             var dependencyStatus = task.Result;
             if (dependencyStatus == DependencyStatus.Available)
             {
-                Debug.Log("Google Play version OK");
-
-                // Firebase Cloud Meassaging ÃÊ±âÈ­
-                FirebaseMessaging.TokenReceived += OnTokenReceivedForAndroid;
+                // Firebase Cloud Meassaging ì´ˆê¸°í™”
+                FirebaseMessaging.TokenReceived += OnTokenReceived;
+#if UNITY_ANDROID
                 FirebaseMessaging.MessageReceived += OnMessageReceivedForAndroid;
+#elif UNITY_IOS
+                FirebaseMessaging.MessageReceived += OnMessageReceivedForApple;
+#endif
                 FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task =>
                 {
                     Debug.Log("push permission: " + task.Status.ToString());
                 });
-                // Token µî·Ï ÃÊ±âÈ­ 
+        
+                // Token ë“±ë¡ ì´ˆê¸°í™” 
                 FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
             }
             else
@@ -92,26 +59,58 @@ public class PushNotificationManager : MonoBehaviour
         });
     }
 
-    public void OnTokenReceivedForAndroid(object sender, TokenReceivedEventArgs token)
+    public void OnTokenReceived(object sender, TokenReceivedEventArgs token)
     {
         Debug.Log("OnTokenReceived: " + token.Token);
     }
 
-    // ¿øÇÏ´Â ¸Ş¼¼Áö ÀÛ¼º °¡´É
+
+#if UNITY_ANDROID
+    // ê¶Œí•œ ë¶€ì—¬ ìš”ì²­ ë©”ì„œë“œ(ì•ˆë“œë¡œì´ë“œ)
+    public void RequestAuthorizationForAndroid()
+    {
+        // Android Version ì²´í¬ ë° API Level ì²´í¬ 
+        var androidInfo = SystemInfo.operatingSystem;
+        Debug.Log("androidInfo: " + androidInfo);
+
+        _androidApiLevel = int.Parse(androidInfo.Substring(androidInfo.IndexOf("-") + 1, 2));
+        Debug.Log("apiLevel: " + _androidApiLevel);
+
+        // API 33ë¶€í„°ëŠ” ì•Œë¦¼ ê²Œì‹œ ê¶Œí•œì„ ìš”ì²­í•´ì•¼ í•¨
+        if (_androidApiLevel >= 33 &&
+            !Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
+        {
+            Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
+        }
+        // API 26ë¶€í„°ëŠ” ì±„ë„ IDë¥¼ í†µí•´ ì•Œë¦¼ ìƒíƒœë¥¼ ì¶”ì í•  ìˆ˜ ìˆìŒ
+        if (_androidApiLevel >= 26)
+        {
+            var channel = new AndroidNotificationChannel()
+            {
+                Id = ChannelId,
+                Name = "PushNotification",
+                Importance = Importance.High,
+                Description = "Notification",
+            };
+            AndroidNotificationCenter.RegisterNotificationChannel(channel);
+        }
+    }
+
+    // ì›í•˜ëŠ” ë©”ì„¸ì§€ ì‘ì„± ê°€ëŠ¥
     public void OnMessageReceivedForAndroid(object sender, MessageReceivedEventArgs e)
     {
-        string type = "";
-        string title = "";
-        string body = "";
+        var type = "";
+        var title = "";
+        var body = "";
 
-        // ¾Ë¸² ¸Ş½ÃÁö¸¦ À§ÇÑ
+        // ì•Œë¦¼ ë©”ì‹œì§€ë¥¼ ìœ„í•œ
         if (e.Message.Notification != null)
         {
             type = "notification";
             title = e.Message.Notification.Title;
             body = e.Message.Notification.Body;
         }
-        // µ¥ÀÌÅÍ ¸Ş½ÃÁö¸¦ À§ÇÑ
+        // ë°ì´í„° ë©”ì‹œì§€ë¥¼ ìœ„í•œ
         else if (e.Message.Data.Count > 0)
         {
             type = "data";
@@ -120,84 +119,41 @@ public class PushNotificationManager : MonoBehaviour
         }
         Debug.Log("message type: " + type + ", title: " + title + ", body: " + body);
 
-        var notification = new AndroidNotification();
+        var notification = new AndroidNotification()
         {
-            notification.SmallIcon = "icon_0";
-            notification.Title = title;
-            notification.Text = body;
-            notification.FireTime = DateTime.Now;
-        }
+            SmallIcon = "icon_0",
+            Title = title,
+	    Text = body,
+            FireTime = DateTime.Now    
+        };
 
-        if (_apiLevel >= 26)
+        if (_androidApiLevel >= 26)
         {
-            AndroidNotificationCenter.SendNotification(notification, _channelID);
+            AndroidNotificationCenter.SendNotification(notification, ChannelId);
         }
         else
         {
-            Debug.LogError("Android 8.0 ÀÌ»óÀÇ µğ¹ÙÀÌ½º¿¡¼­¸¸ Çª½Ã ¾Ë¸²ÀÌ Á¤»óÀûÀ¸·Î Ç¥½ÃµË´Ï´Ù.");
+            Debug.LogError("Android 8.0 ì´ìƒì˜ ë””ë°”ì´ìŠ¤ì—ì„œë§Œ í‘¸ì‹œ ì•Œë¦¼ì´ ì •ìƒì ìœ¼ë¡œ í‘œì‹œë©ë‹ˆë‹¤.");
         }
     }
-#endif
-
-
-#if UNITY_IOS
-    // ±ÇÇÑ ºÎ¿© ¿äÃ»ÇÏ´Â ¸Ş¼­µå(iOS)
-    public IEnumerator<string> RequestAuthorization()
+#elif UNITY_IOS
+    // ê¶Œí•œ ë¶€ì—¬ ìš”ì²­í•˜ëŠ” ë©”ì„œë“œ(iOS)
+    public IEnumerator<string> RequestAuthorizationForApple()
     {
         var request = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true);
         while (!request.IsFinished)
         {
             yield return null;
         }
-
-        string respond = "\n RequestAuthorization: ";
-        respond += "\n finished: " + request.IsFinished;
-        respond += "\n granted :  " + request.Granted;
-        respond += "\n error:  " + request.Error;
-        respond += "\n deviceToken:  " + request.DeviceToken;
-        Debug.Log(respond);
     }
 
-    public void OnFirebaseCloudMessagingForApple()
-    {
-        // Dependecy Ã¼Å© ¹× FirebaseCloudMessaging ½ÇÇà ¸Ş¼­µå
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-        {
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == DependencyStatus.Available)
-            {
-                // Firebase Cloud Meassaging ÃÊ±âÈ­
-                FirebaseMessaging.TokenReceived += OnTokenReceivedForApple;
-                FirebaseMessaging.MessageReceived += OnMessageReceivedForApple;
-                FirebaseMessaging.RequestPermissionAsync().ContinueWithOnMainThread(task =>
-                {
-                    Debug.Log("push permission: " + task.Status.ToString());
-                });
-                // Token µî·Ï ÃÊ±âÈ­ 
-                FirebaseMessaging.TokenRegistrationOnInitEnabled = true;
-            }
-            else
-            {
-                Debug.LogError(string.Format(
-                    "Could not resolve all Firebase dependencies: {0}",
-                    dependencyStatus
-                ));
-            }
-        });
-    }
-
-    public void OnTokenReceivedForApple(object sender, TokenReceivedEventArgs token)
-    {
-        Debug.Log("ontokenreceived: " + token.Token);
-    }
-
-    // ¿øÇÏ´Â ¸Ş¼¼Áö ÀÛ¼º °¡´É
+    // ì›í•˜ëŠ” ë©”ì„¸ì§€ ì‘ì„± ê°€ëŠ¥
     public void OnMessageReceivedForApple(object sender, MessageReceivedEventArgs e)
     {
-        string type = "";
-        string title = "";
-        string body = "";
-        int fireTimeinSeconds = 1;
+        var type = "";
+        var title = "";
+        var body = "";
+        const int fireTimeinSeconds = 0;
 
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
         {
@@ -205,14 +161,14 @@ public class PushNotificationManager : MonoBehaviour
             Repeats = false
         };
 
-        // ¾Ë¸² ¸Ş½ÃÁö¸¦ À§ÇÑ
+        // ì•Œë¦¼ ë©”ì‹œì§€ë¥¼ ìœ„í•œ
         if (e.Message.Notification != null)
         {
             type = "notification";
             title = e.Message.Notification.Title;
             body = e.Message.Notification.Body;
         }
-        // µ¥ÀÌÅÍ ¸Ş½ÃÁö¸¦ À§ÇÑ
+        // ë°ì´í„° ë©”ì‹œì§€ë¥¼ ìœ„í•œ
         else if (e.Message.Data.Count > 0)
         {
             type = "data";
@@ -224,15 +180,14 @@ public class PushNotificationManager : MonoBehaviour
         var notification = new iOSNotification()
         {
             Identifier = "_notification_01",
-            Title = "Title",
-            Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
-            Subtitle = "This is a subtitle, something, something important...",
+            Title = title,
+            Body = body,
+            Subtitle = "",
             ShowInForeground = true,
             ForegroundPresentationOption = (PresentationOption.Alert | PresentationOption.Sound),
             CategoryIdentifier = "category_a",
             ThreadIdentifier = "thread1",
             Trigger = timeTrigger,
-
         };
 
         iOSNotificationCenter.ScheduleNotification(notification);
