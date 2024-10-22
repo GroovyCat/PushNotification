@@ -8,7 +8,7 @@
 + Mobile Notification 2.3.2 -> Package Manager를 통해 import
 + Firebase Unity로 프로젝트 설정 및 패키지명 통일(Unity app의 패키지명 - android/ios)
 + google-services.json 및 GoogleService-Info.plist 다운로드 후 Assets 폴더에 저장
-+ Firebase Unity SDK 12.3.1 -> Firebase Console를 통해 다운로드
++ Firebase Unity SDK 12.3.0 -> Firebase Console를 통해 다운로드
   + Unity 프로젝트 상단에 Assets > Import Package > Custom Package
   + FirebaseAnalytics.unitypackage, FirebaseMessaging.unitypackage import
 
