@@ -33,9 +33,9 @@ keytool -list -v keystore 생성한 keyname.keystore
   + Apple Push Notifications service (APNs) 체크 > Register > Download(다운로드는 한번만 가능) -> 설치 경로 꼭 확인
   + 설치 경로 .p8 파일이 있는 것을 확인하고 Identifiers에서 앱 등록 > service 중 Push Notification 체크
 + Firebase Console에서 iOS 앱 설정 > APN 인증 키 업로드 > .p8 업로드 및 Key ID, Team ID 입력
-+ 유니티 iOS 필드 세팅 후 빌드 후 Xcode로 .workspace 파일 열기
++ 유니티 iOS 빌드 세팅 후 빌드 후 Xcode로 .workspace 파일 열기
 + General 탭에서 UserNotifications.framework 라이브러리 추가
-+ Automatically manage signing 체크
++ Automatically manage signing 체크(상황에 따라 체크를 안할 수 있음)
 + Siging & Capabilities에서 **+** Capability 클릭 > Push Notification 추가
 + Xcode에서 앱 빌드 후 실행
 + Firebase Console 프로젝트에서 Messaging 서비스를 통해 푸시 알림 테스트 진행
