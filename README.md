@@ -15,8 +15,8 @@
 + AndroidManifest.xml 열기 후 코드 추가
 ```XML
 <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" /> // FirebaseAnlytics가 광고이기 때문에 이 코드를 넣으면 구글 광고 관련한 모든 서비스 권한을 없앨 수 있음
-<meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
-<meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+<meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" /> // 토큰 자동 초기화 방지
+<meta-data android:name="firebase_analytics_collection_enabled" android:value="false" /> // 토큰 자동 초기화 방지
 ```
 
 
