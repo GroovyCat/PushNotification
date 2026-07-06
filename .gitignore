@@ -77,3 +77,11 @@ crashlytics-build.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# Firebase 설정 파일 (보안)
+google-services.json
+GoogleService-Info.plist
+
+# Android Keystore (보안)
+*.keystore
+*.jks
