@@ -85,3 +85,6 @@ GoogleService-Info.plist
 # Android Keystore (보안)
 *.keystore
 *.jks
+
+# Apple APNs 키 (보안)
+*.p8
